@@ -48,7 +48,13 @@ exports.config = {
             'version': '1.0',
             'jiraUser': 'XXX',
             'jiraPassword': 'XXX',
-            'xrayUrl': 'https://jira.com/rest/raven/1.0/import/execution'
+            'xrayUrl': 'https://jira.com/rest/raven/1.0/import/execution',
+            'jiraClientID': 'XXX',
+            'jiraClientSecret': 'XXX', 
+            // the jira client id and client secret can be got by this instruction: 
+            // https://confluence.xpand-it.com/display/XRAYCLOUD/Global+Settings%3A+API+Keys
+            'xrayCloudUrl': 'https://xray.cloud.xpand-it.com/api/v1/import/execution',
+            'xrayCloudAuthenticateUrl': 'https://xray.cloud.xpand-it.com/api/v1/authenticate'
         };
 
         // add the reporter
