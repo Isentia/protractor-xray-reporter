@@ -56,19 +56,15 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser, cloudFl
         info: {
             description: options.description,
             revision: options.version,
-            testEnvironments: ['PRODUCTION'],
-            version: "1.0",
-            user: "Jake See",
-            startDate: "2019-03-15T11:47:35+01:00",
-            finishDate: "2019-03-15T11:53:00+01:00",
-            testPlanKey: "PRDS-11918"
+            testEnvironments: ['Production'],
+            version: "",
+            user: "Danfeng Yu",
+            // startDate: "2019-03-15T11:47:35+01:00",
+            // finishDate: "2019-03-15T11:53:00+01:00",
+            // testPlanKey: "PRDS-11918"
         },
         tests: []
     };
-
-    if(updateFlag){
-        result.testExecutionKey=''
-    }
 
     browser.getProcessedConfig().then((config) => {
         result.info.summary = config.capabilities.name || 'Test execution for';
@@ -83,15 +79,14 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser, cloudFl
     let specPromisesResolve = {};
 
     this.suiteStarted = (suite) => {
-        var testSuiteList = suite.description.split('@')
-        result.testExecutionKey = testSuiteList[2]
+        var testSuiteList = suite.description.split('@')[1].split(" ")
         result.tests.push({
-            testKey: testSuiteList[1],
+            testKey: testSuiteList[0],
             start: getDate(),
             steps: []
         });
 
-        result.info.summary = result.info.summary + ' ' + testSuiteList[1] + ' '
+        result.info.summary = result.info.summary + ' ' + testSuiteList[0] + ' '
     };
 
     this.specStarted = (spec) => {
@@ -185,12 +180,15 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser, cloudFl
     };
 
     this.suiteDone = (suite) => {
-        const testKey = suite.description.split('@')[1];
+        const testKey = suite.description.split('@')[1].split(" ")[1];
         for (let test of result.tests) {
             if (test.testKey === testKey) {
                 test.finish = getDate();
                 break;
             }
+        }
+        if(updateFlag){
+            result.testExecutionKey=suite.description.split('@')[1].split(" ")[1]
         }
     };
 
@@ -210,6 +208,7 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser, cloudFl
             if(cloudFlag){
                 return XrayCloudService.getAuthentication()
                     .then((xrayToken)=>{
+                        console.log("payload: " + JSON.stringify(result, null, 2))
                         return XrayCloudService.createExecution(result, () => {
                             if(onCompleteDefer.resolve){
                                 onCompleteDefer.resolve();

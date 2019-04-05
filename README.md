@@ -58,7 +58,10 @@ exports.config = {
         };
 
         // add the reporter
-        jasmine.getEnv().addReporter(XrayReporter(options, onPrepareDefer, onCompleteDefer, browser));
+        jasmine.getEnv().addReporter(XrayReporter(options, onPrepareDefer, onCompleteDefer, browser, true, true));
+
+        // set cloudFlag=true to use the xray cloud version
+        // set updateFlag=true to update an existing test execution ticket in jira rather than creating new test execution ticket
 
         // return the promises for onPrepare..
         return onPrepareDefer.promise;
@@ -90,9 +93,14 @@ exports.config = {
  The version has to exist before it is used, currently this reporter does not
  create versions.
 
-* `jiraUser` (required)
-* `jiraPassword` (required)
-* `xrayUrl` (required)
+* `jiraUser` (required if using server version)
+* `jiraPassword` (required if using server version)
+* `xrayUrl` (required if using server version)
+* `jiraClientID` (required if using cloud version)
+* `jiraClientSecret` (required if using cloud version)
+* `xrayCloudAuthenticateUrl`(required for generating client token if using cloud version)
+* `xrayCloudUrl` (required if using cloud version)
+
 
  This is your Xray api url
 
@@ -100,7 +108,9 @@ exports.config = {
 
 A test set is represented by a describe block.
 The test set ID has to be added at the end of the description with an @
-symbol.
+symbol. 
+The test execution ID has to be added at the end of the description 
+after test set ID and a space.
 
 A test step is represented by an it block.
 
@@ -109,7 +119,8 @@ test step with an @ symbol. You can use any tag you like, as long as it is
 unique and has no spaces.
 
 ```javascript
-describe('test set description @ABC-1', function() {
+describe('test set description @ABC-1 DEF-1', function() { 
+    // @ABC-1 is test set id, DEF-1 is test exeution id 
 
     it('should do something', function() {
         expect(2).toEqual(2);
@@ -128,4 +139,8 @@ describe('test set description @ABC-1', function() {
 #### Xray API documentation
 
 http://confluence.xpand-addons.com/pages/viewpage.action?pageId=19695422
+
+#### Xray Cloud API documentation
+
+https://confluence.xpand-it.com/pages/viewpage.action?pageId=31622291
 
