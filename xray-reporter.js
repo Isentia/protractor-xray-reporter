@@ -26,7 +26,7 @@ const getDate = () => {
     return date.toISOString().split('.')[0] + tz;
 };
 
-const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser) => {
+const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser, cloudFlag=false, updateFlag=false) => {
 
     if (!options.hasOwnProperty('xrayUrl') || !options.hasOwnProperty('jiraPassword') || !options.hasOwnProperty('jiraUser')) {
         throw new Error('required options are missing');
@@ -49,18 +49,25 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser) => {
         return imageName;
     };
 
-    const XrayService = require('./xray-service')(options);
+    const XrayService = require('./xray-service').XrayService(options);
+    const XrayCloudService = require('./xray-service').XrayCloudService(options);
 
     let result = {
         info: {
             description: options.description,
-            version: options.version
+            revision: options.version,
+            testEnvironments: ['Production'],
+            version: "",
+            user: "Danfeng Yu",
+            // startDate: "2019-03-15T11:47:35+01:00",
+            // finishDate: "2019-03-15T11:53:00+01:00",
+            // testPlanKey: "PRDS-11918"
         },
         tests: []
     };
 
     browser.getProcessedConfig().then((config) => {
-        result.info.summary = config.capabilities.name || 'no name';
+        result.info.summary = config.capabilities.name || 'Test execution for';
         if(onPrepareDefer.resolve){
             onPrepareDefer.resolve();
         } else {
@@ -72,11 +79,14 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser) => {
     let specPromisesResolve = {};
 
     this.suiteStarted = (suite) => {
+        var testSuiteList = suite.description.split('@')[1].split(" ")
         result.tests.push({
-            testKey: suite.description.split('@')[1],
+            testKey: testSuiteList[0],
             start: getDate(),
             steps: []
         });
+
+        result.info.summary = result.info.summary + ' ' + testSuiteList[0] + ' '
     };
 
     this.specStarted = (spec) => {
@@ -88,7 +98,7 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser) => {
     this.specDone = (spec) => {
         const testKey = spec.fullName.split('@')['1'].split(' ')[0];
         let index;
-        result.tests.forEach((test, i) => {
+        result.tests.forEach((test, i) => {            
             if (test.testKey === testKey) {
                 index = i;
             }
@@ -101,33 +111,33 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser) => {
             });
             specPromisesResolve[spec.id]();
         } else {
-
             let specResult;
-
+            var failStr = cloudFlag? "FAILED": "FAIL";
+            var passStr = cloudFlag? "PASSED": "PASS";
             if (spec.status !== 'passed') {
-                result.tests[index].status = 'FAIL';
+                result.tests[index].status = failStr;
                 let comment = '';
                 for (let expectation of spec.failedExpectations) {
                     comment += expectation.message;
                 }
                 specResult = {
-                    status: 'FAIL',
+                    status: failStr,
                     comment,
                     evidences: [],
                     id: spec.id
                 };
             } else {
-                result.tests[index].status !== 'FAIL' ? result.tests[index].status = 'PASS' : 'FAIL';
+                result.tests[index].status !== failStr ? result.tests[index].status = passStr : failStr;
                 specResult = {
-                    status: 'PASS',
+                    status: passStr,
                     evidences: [],
                     id: spec.id
                 };
             }
 
-            if ((specResult.status === 'FAIL' && options.screenshot !== 'never') || options.screenshot === 'always') {
+            if ((specResult.status === failStr && options.screenshot !== 'never') || options.screenshot === 'always') {
                 let specDonePromises = [];
-
+                
                 specDonePromises.push(new Promise((resolve) => {
                     browser.takeScreenshot().then((png) => {
                         specResult.evidences.push({
@@ -170,16 +180,20 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser) => {
     };
 
     this.suiteDone = (suite) => {
-        const testKey = suite.description.split('@')[1];
+        const testKey = suite.description.split('@')[1].split(" ")[1];
         for (let test of result.tests) {
             if (test.testKey === testKey) {
                 test.finish = getDate();
                 break;
             }
         }
+        if(updateFlag){
+            result.testExecutionKey=suite.description.split('@')[1].split(" ")[1]
+        }
     };
 
     this.jasmineDone = () => {
+        result.info.summary = result.info.summary.trim()
         Promise.all(specPromises).then(() => {
             result.tests = result.tests.filter((test) => {
                 return !!test.status;
@@ -191,13 +205,29 @@ const XrayReporter = (options, onPrepareDefer, onCompleteDefer, browser) => {
                     delete step.id;
                 });
             }
-            XrayService.createExecution(result, () => {
-                if(onCompleteDefer.resolve){
-                    onCompleteDefer.resolve();
-                } else {
-                    onCompleteDefer.fulfill();
-                }
-            });
+            if(cloudFlag){
+                return XrayCloudService.getAuthentication()
+                    .then((xrayToken)=>{
+                        console.log("payload: " + JSON.stringify(result, null, 2))
+                        return XrayCloudService.createExecution(result, () => {
+                            if(onCompleteDefer.resolve){
+                                onCompleteDefer.resolve();
+                            } else {
+                                onCompleteDefer.fulfill();
+                            }
+                        }, xrayToken);
+                    })
+            }
+            else{
+                XrayService.createExecution(result, () => {
+                    if(onCompleteDefer.resolve){
+                        onCompleteDefer.resolve();
+                    } else {
+                        onCompleteDefer.fulfill();
+                    }
+                });
+            }
+            
         });
     };
 

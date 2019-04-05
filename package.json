@@ -1,8 +1,53 @@
 {
-  "name": "protractor-xray-reporter",
-  "version": "1.0.6",
+  "_from": "protractor-xray-reporter@^1.0.6",
+  "_id": "protractor-xray-reporter@1.0.6",
+  "_inBundle": false,
+  "_integrity": "sha512-XoGQWcSkqqkAJjSaYpFWqByX4aetVFYUJ6jB6/bvxLG7hT774oj/ZDKsL5AXTyT3fb59VC6kIJlXACHpjrMpTA==",
+  "_location": "/protractor-xray-reporter",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "protractor-xray-reporter@^1.0.6",
+    "name": "protractor-xray-reporter",
+    "escapedName": "protractor-xray-reporter",
+    "rawSpec": "^1.0.6",
+    "saveSpec": null,
+    "fetchSpec": "^1.0.6"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/protractor-xray-reporter/-/protractor-xray-reporter-1.0.6.tgz",
+  "_shasum": "43c2cec2d687af28fb58e6716a1967719d07e061",
+  "_spec": "protractor-xray-reporter@^1.0.6",
+  "_where": "C:\\Repositories\\mp-angular-frontend-qa",
+  "author": {
+    "name": "Lukas Reineke",
+    "email": "lukas.reineke@protonmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/lukas-reineke/protractor-xray-reporter/issues"
+  },
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Dimitri Rybak",
+      "email": "kontakt@dimitri-rybak.de"
+    },
+    {
+      "name": "Danni Danfeng Yu ",
+      "email": "danffie@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "popsicle": "^10.0.1",
+    "popsicle-basic-auth": "^1.0.0"
+  },
+  "deprecated": false,
   "description": "Xray reporter for Jasmin and Protractor",
-  "main": "xray-reporter.js",
+  "homepage": "https://github.com/lukas-reineke/protractor-xray-reporter#readme",
   "keywords": [
     "jasmine",
     "protractor",
@@ -13,17 +58,12 @@
     "jira",
     "xray"
   ],
+  "license": "MIT",
+  "main": "xray-reporter.js",
+  "name": "protractor-xray-reporter",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lukas-reineke/protractor-xray-reporter"
+    "url": "git+https://github.com/lukas-reineke/protractor-xray-reporter.git"
   },
-  "author": "Lukas Reineke <lukas.reineke@protonmail.com>",
-  "contributors": [
-    "Dimitri Rybak <kontakt@dimitri-rybak.de>"
-  ],
-  "license": "MIT",
-  "dependencies": {
-    "popsicle": "^10.0.1",
-    "popsicle-basic-auth": "^1.0.0"
-  }
+  "version": "1.0.7"
 }
