@@ -35,6 +35,10 @@
     {
       "name": "Dimitri Rybak",
       "email": "kontakt@dimitri-rybak.de"
+    },
+    {
+      "name": "Danni Danfeng Yu ",
+      "email": "danffie@gmail.com"
     }
   ],
   "dependencies": {
@@ -61,5 +65,5 @@
     "type": "git",
     "url": "git+https://github.com/lukas-reineke/protractor-xray-reporter.git"
   },
-  "version": "1.0.6"
+  "version": "1.0.7"
 }
