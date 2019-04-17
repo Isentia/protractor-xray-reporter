@@ -65,5 +65,5 @@
     "type": "git",
     "url": "git+https://github.com/lukas-reineke/protractor-xray-reporter.git"
   },
-  "version": "1.0.7"
+  "version": "1.1.0"
 }
